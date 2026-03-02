@@ -1,22 +1,20 @@
-# network_monitor.py
-from scapy.all import sniff, IP, TCP, UDP
-from colorama import Fore, Style
+from scapy.all import sniff, IP
+from events import Event
+from datetime import datetime
 
-PORTS_SUSPICIOUS = [22, 23, 3389]
+def packet_handler(packet, event_queue):
+    if IP in packet:
+        event = Event(
+            timestamp=str(datetime.now()),
+            source="network",
+            event_type="packet",
+            src_ip=packet[IP].src,
+            dst_ip=packet[IP].dst,
+            protocol=packet.proto,
+            severity="low"
+        )
+        event_queue.put(event)
 
-def process_packet(packet):
-    src_ip = packet[IP].src if packet.haslayer(IP) else "N/A"
-    dst_ip = packet[IP].dst if packet.haslayer(IP) else "N/A"
-    protocol = "TCP" if packet.haslayer(TCP) else "UDP" if packet.haslayer(UDP) else "OTHER"
-    dst_port = packet[TCP].dport if packet.haslayer(TCP) else packet[UDP].dport if packet.haslayer(UDP) else 0
-
-    severity = "LOW"
-    if dst_port in PORTS_SUSPICIOUS:
-        severity = "HIGH"
-        print(Fore.RED + f"[ALERT] Suspicious {protocol} packet {src_ip} -> {dst_ip}:{dst_port}" + Style.RESET_ALL)
-    else:
-        print(Fore.GREEN + f"[INFO] {protocol} packet {src_ip} -> {dst_ip}:{dst_port}" + Style.RESET_ALL)
-
-def start_network_monitor():
-    print("Network monitoring started...")
-    sniff(prn=process_packet, store=False)
+def monitor_network(event_queue):
+    print("[+] Network monitoring started")
+    sniff(prn=lambda pkt: packet_handler(pkt, event_queue), store=0)

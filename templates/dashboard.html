@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>TerminalMonitor SIEM Dashboard</title>
+    <style>
+        body { font-family: monospace; background: #0f1117; color: #00ff9c; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 8px; border-bottom: 1px solid #00ff9c; }
+        th { background: #111; }
+        tr:hover { background: #1a1a1a; }
+    </style>
+</head>
+<body>
+
+<h2>🛡 TerminalMonitor — Mini SIEM Dashboard</h2>
+
+<table>
+<tr>
+<th>Time</th>
+<th>Source</th>
+<th>Type</th>
+<th>Src IP</th>
+<th>Dst IP</th>
+<th>Protocol</th>
+<th>Message</th>
+<th>Severity</th>
+</tr>
+
+{% for e in events %}
+<tr>
+<td>{{ e[1] }}</td>
+<td>{{ e[2] }}</td>
+<td>{{ e[3] }}</td>
+<td>{{ e[4] }}</td>
+<td>{{ e[5] }}</td>
+<td>{{ e[6] }}</td>
+<td>{{ e[7] }}</td>
+<td>{{ e[8] }}</td>
+</tr>
+{% endfor %}
+
+</table>
+
+</body>
+</html>
